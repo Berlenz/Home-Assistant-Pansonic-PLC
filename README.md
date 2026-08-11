@@ -49,7 +49,7 @@ panasonic_plc:
     station_number: 1
     scan_interval: 1.0  # seconds, examples: 0.5 or 00:00:00.500000 or 00:00:10
 
-    sensors:  # PLC -> Home Assistant: Fetch data from the PLC to Home Assistant based on the configured "scan_interval".
+    sensors:  # PLC -> Home Assistant. Define entities to fetch data from the PLC to Home Assistant based on the configured "scan_interval".
       - name: "Heatpump Circulation Pump" #sensor.heatpump_circulation_pump
         fp_address: "Y27F"
         data_type: "BOOL"
