@@ -171,7 +171,7 @@ class PanasonicPlcHub:
         requests: list[tuple[str, str]] = []
         for sensor_config in self.sensor_configs:
             sFPAddress = sensor_config.get(CONF_PANASONIC_PLC_FP_ADDRESS)
-            sDataType = sensor_config.get(CONF_PANASONIC_PLC_DATA_TYPE)
+            sDataType = str(sensor_config.get(CONF_PANASONIC_PLC_DATA_TYPE, "")).upper()
             if not sFPAddress or not sDataType:
                 continue
             requests.append((sFPAddress, sDataType))

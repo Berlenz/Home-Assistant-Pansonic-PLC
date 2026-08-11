@@ -32,7 +32,7 @@ def create_panasonic_plc_exposure(hass: HomeAssistant, connection: MewtocolComCo
     """Create exposures from config."""
     sEntityID = config[CONF_ENTITY_ID]
     sFPAddress = config[CONF_PANASONIC_PLC_FP_ADDRESS]
-    sDataType = config[CONF_PANASONIC_PLC_DATA_TYPE]
+    sDataType = str(config[CONF_PANASONIC_PLC_DATA_TYPE]).upper()
     sDefaultValue = config.get(CONF_EXPOSE_DEFAULT_VALUE)
     exposure = ExposeSensor(
         hass,

@@ -29,6 +29,7 @@ from .const import (
     DATA_HUBS,
     DOMAIN,
 )
+from .MewtocolComConnection import DataTypes
 from .panasonic_plc_hub import PanasonicPlcHub, get_hub_name
 
 _LOGGER = logging.getLogger(__name__)
@@ -95,7 +96,7 @@ class PanasonicPlcSensor(
         self._hub = hub
         self._entry = entry
         self._sFPAddress = entry.get(CONF_PANASONIC_PLC_FP_ADDRESS)
-        self._sDataType = entry.get(CONF_PANASONIC_PLC_DATA_TYPE)
+        self._sDataType = str(entry.get(CONF_PANASONIC_PLC_DATA_TYPE, "")).upper()
         self._uiPrecision = entry.get(CONF_REAL_NUMBER_PRECISION)
         self._attr_name = entry.get(CONF_NAME) or self._sFPAddress
         self._attr_unique_id = f"{self._hub.name}-{self._sFPAddress}"
@@ -120,7 +121,7 @@ class PanasonicPlcSensor(
 
     def _format_value(self, value: Any) -> Any:
         """Format REAL values according to the configured precision."""
-        if self._sDataType == "REAL" and self._uiPrecision is not None:
+        if self._sDataType == DataTypes.REAL and self._uiPrecision is not None:
             try:
                 return f"{float(value):.{self._uiPrecision}f}"
             except (TypeError, ValueError):
