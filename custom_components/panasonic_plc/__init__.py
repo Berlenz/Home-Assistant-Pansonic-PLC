@@ -49,6 +49,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
                 conf_hub,
                 config,
             )
+            await async_load_platform(
+                hass,
+                Platform.BINARY_SENSOR,
+                DOMAIN,
+                conf_hub,
+                config,
+            )
 
     return True
 
@@ -59,7 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hub.async_setup()
     hubs = hass.data.setdefault(DOMAIN, {})
     hubs.setdefault(DATA_HUBS, {})[entry.entry_id] = hub
-    await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
+    await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR, Platform.BINARY_SENSOR])
 
     if not hass.services.has_service(DOMAIN, SERVICE_NAME__WRITE_TO_PANASONIC_PLC):
         hass.services.async_register(
@@ -74,7 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload the config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, [Platform.SENSOR])
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, [Platform.SENSOR, Platform.BINARY_SENSOR])
     if unload_ok:
         hub = hass.data[DOMAIN][DATA_HUBS].pop(entry.entry_id)
         await hub.async_close()

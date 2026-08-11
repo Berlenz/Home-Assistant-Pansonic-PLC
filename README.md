@@ -53,6 +53,7 @@ panasonic_plc:
       - name: "Heatpump Circulation Pump" #sensor.heatpump_circulation_pump
         fp_address: "Y27F"
         data_type: "BOOL"
+        icon: mdi:pump
 
       - name: "Heatpump Buffer Inlet Temperature" #sensor.heatpump_buffer_inlet_temperature
         fp_address: "DDT667"
@@ -65,6 +66,7 @@ panasonic_plc:
       - name: "Heatpump Diverter Valve Request OPEN"  #sensor.heatpump_diverter_valve_request_open
         fp_address: "X26F"
         data_type: "BOOL"
+        icon: mdi:valve-open
 
     expose:  # Home Assistant -> PLC: When the sensor value changes in Home Assistant, write the value to the PLC.
       - entity_id: "binary_sensor.is_door_open"

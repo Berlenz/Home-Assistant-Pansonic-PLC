@@ -8,7 +8,7 @@ from typing import ClassVar
 
 import voluptuous as vol
 from homeassistant.components.sensor import CONF_STATE_CLASS, DEVICE_CLASSES_SCHEMA, STATE_CLASSES_SCHEMA, SensorStateClass
-from homeassistant.const import CONF_DEVICE_CLASS, CONF_ENTITY_ID, CONF_NAME, CONF_PORT, CONF_SCAN_INTERVAL, CONF_SENSORS, CONF_UNIT_OF_MEASUREMENT
+from homeassistant.const import CONF_DEVICE_CLASS, CONF_ENTITY_ID, CONF_ICON, CONF_NAME, CONF_PORT, CONF_SCAN_INTERVAL, CONF_SENSORS, CONF_UNIT_OF_MEASUREMENT
 from homeassistant.helpers import config_validation as cv
 
 from .MewtocolComConnection import DataTypes
@@ -71,6 +71,7 @@ class SensorSchema(PanasonicPLCPlatformSchema):
             vol.Required(CONF_PANASONIC_PLC_FP_ADDRESS): cv.string, #FP address in the PLC
             vol.Required(CONF_PANASONIC_PLC_DATA_TYPE): data_type_validator, #Data type of the address in the PLC
             vol.Optional(CONF_REAL_NUMBER_PRECISION, default=None): vol.Any(None, cv.positive_int), #Precision for REAL numbers like precision = 2 => "1.12" or precision = 3 => "1.123"
+            vol.Optional(CONF_ICON): cv.icon,
             vol.Optional(CONF_UNIT_OF_MEASUREMENT): cv.string,
             vol.Optional(CONF_DEVICE_CLASS): DEVICE_CLASSES_SCHEMA,
             vol.Optional(CONF_STATE_CLASS, default=SensorStateClass.MEASUREMENT): STATE_CLASSES_SCHEMA,

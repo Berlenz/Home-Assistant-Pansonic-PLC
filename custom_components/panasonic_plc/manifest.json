@@ -1,7 +1,7 @@
 {
   "domain": "panasonic_plc",
   "name": "Panasonic PLC",
-  "documentation": "https://github.com/Berlenz/Home-Assistant-Pansonic-PLC/blob/main/README.md",
+  "documentation": "https://www.home-assistant.io/integrations/panasonic_plc",
   "version": "2.0.0",
   "dependencies": [],
   "requirements": [],
