@@ -1,0 +1,12 @@
+{
+  "domain": "panasonic_plc",
+  "name": "Panasonic PLC",
+  "documentation": "https://www.home-assistant.io/integrations/panasonic_plc",
+  "version": "2.0.0",
+  "dependencies": [],
+  "requirements": [],
+  "config_flow": true,
+  "iot_class": "local_polling",
+  "codeowners": ["@berlenz"],
+  "integration_type": "service"
+}

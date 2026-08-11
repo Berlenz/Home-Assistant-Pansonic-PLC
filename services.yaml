@@ -1,0 +1,41 @@
+write:
+  name: "Write to Panasonic PLC"
+  description: "Writes arbitrary data directly to Panasonic PLC."
+  fields:
+    ipv4_address_or_plc_name:
+      name: "IPv4 address or PLC name"
+      description: "If set, the connection corresponding to the defined IPv4 address or PLC name is used. If not set, the first connection is used."
+      required: false
+      example: "192.168.178.110"
+      selector:
+        text:
+    fp_address:
+      name: "FP address"
+      description: "FP address to write to."
+      required: true
+      example: "DT0"
+      selector:
+        text:
+    data_type:
+      name: "Data type"
+      description: "Data type of the value."
+      required: true
+      example: "INT"
+      selector:
+        select:
+          options:
+            - "BOOL"
+            - "INT"
+            - "DINT"
+            - "UINT"
+            - "UDINT"
+            - "WORD"
+            - "DWORD"
+            - "REAL"
+    payload:
+      name: "Payload"
+      description: "Value to send to the Panasonic PLC."
+      required: true
+      example: "123"
+      selector:
+        text:
