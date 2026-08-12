@@ -158,10 +158,7 @@ class MewtocolComConnection:
     def ReadFromPlc_INT_DINT(self, sFPAddress: str) -> str | None: #Read values as data type INT ("-32768" to "32767"), DINT ("-2147483648" to "2147483647")
         if self._IsContactAddress(sFPAddress):
             raise Exception_InvalidAddress(f"{sFPAddress} is invalid or not usable with the data type INT or DINT") #Not allowed addresse: R0, X0, Y0, L0, T0, C1000
-        sHexValue = self._ReadFromPlc_SingleAddress(sFPAddress) #Allowed addresses 16bit: DT0, FL0, WR0, WX0, WY0, WL0 => INT; 32bit: DDT0, DFL0, DWR0, DWX0, DWY0, DWL0 => DINT
-        if sHexValue is not None:
-            return str(int.from_bytes(bytes.fromhex(sHexValue), byteorder="big", signed=True)) #hex to integer
-        return None
+        return self._DecodeBatchValue(self._ReadFromPlc_SingleAddress(sFPAddress), DataTypes.INT) #Allowed addresses 16bit: DT0, FL0, WR0, WX0, WY0, WL0 => INT; 32bit: DDT0, DFL0, DWR0, DWX0, DWY0, DWL0 => DINT
 
     def WriteToPlc_INT_DINT(self, sFPAddress: str, sValue: str) -> bool: #Write values as data type INT ("-32768" to "32767"), DINT ("-2147483648" to "2147483647")
         if self._IsContactAddress(sFPAddress):
@@ -172,10 +169,7 @@ class MewtocolComConnection:
     def ReadFromPlc_UINT_UDINT(self, sFPAddress: str) -> str | None: #Read values as data type UINT ("0" to "65535"), UDINT ("0" to "4294967295")
         if self._IsContactAddress(sFPAddress):
             raise Exception_InvalidAddress(f"{sFPAddress} is invalid or not usable with the data type UINT or UDINT") #Not allowed addresse: R0, X0, Y0, L0, T0, C1000
-        sHexValue = self._ReadFromPlc_SingleAddress(sFPAddress) #Allowed addresses 16bit: DT0, FL0, WR0, WX0, WY0, WL0 => UINT; 32bit: DDT0, DFL0, DWR0, DWX0, DWY0, DWL0 => UDINT
-        if sHexValue is not None:
-            return str(int(sHexValue, 16))
-        return None
+        return self._DecodeBatchValue(self._ReadFromPlc_SingleAddress(sFPAddress), DataTypes.UINT) #Allowed addresses 16bit: DT0, FL0, WR0, WX0, WY0, WL0 => UINT; 32bit: DDT0, DFL0, DWR0, DWX0, DWY0, DWL0 => UDINT
 
     def WriteToPlc_UINT_UDINT(self, sFPAddress: str, sValue: str) -> bool: #Write values as data type UINT ("0" to "65535"), UDINT ("0" to "4294967295")
         if self._IsContactAddress(sFPAddress):
@@ -186,10 +180,7 @@ class MewtocolComConnection:
     def ReadFromPlc_REAL(self, sFPAddress: str) -> str | None: #Read values as data type REAL (e.g. "3.1415")
         if not self._Is32BitAddress(sFPAddress):
             raise Exception_InvalidAddress(f"{sFPAddress} is invalid or not usable with the data type REAL") #Not allowed addresse: 0, X0, Y0, L0, T0, C1000, WR0, WX0, WY0, WL0, DT0, FL0
-        sHexValue = self._ReadFromPlc_SingleAddress(sFPAddress) #Allowed addresses: DDT0, DFL0, DWR0, DWX0, DWY0, DWL0
-        if sHexValue is not None:
-            return str(struct.unpack(">f", struct.pack(">I", int(sHexValue, 16)))[0]) #32 bit hex data into IEEE 754 floating point
-        return None
+        return self._DecodeBatchValue(self._ReadFromPlc_SingleAddress(sFPAddress), DataTypes.REAL) #Allowed addresses: DDT0, DFL0, DWR0, DWX0, DWY0, DWL0
 
     def WriteToPlc_REAL(self, sFPAddress: str, sValue: str) -> bool: #Write values as data type REAL (e.g. "3.1415")
         if not self._Is32BitAddress(sFPAddress):
@@ -287,6 +278,7 @@ class MewtocolComConnection:
 
     def _ReadFromPlcBatchGroupWordAddresses(self, requests: list[tuple[str, str]]) -> dict[str, str | None]:
         """Only processes word addresses like DT0, FL0, LD0, WL0, WX0, WY0, WR0. Ignors bit addresses like R0, X0, Y0, L0, T0, C1000"""
+        #_LOGGER.warning("Panasonic PLC batch word debug marker: requests=%s", requests)
         if not requests:
             return {}
 
@@ -306,13 +298,20 @@ class MewtocolComConnection:
                     results[sFPAddress] = None
                 continue
 
+            response_words = [response_data[i : i + 4] for i in range(0, len(response_data), 4)]
+            if len(response_words) * 4 != len(response_data):
+                for sFPAddress, _, _, _, _ in grouped:
+                    results[sFPAddress] = None
+                continue
+
+            response_word_count = len(response_words)
+
             for sFPAddress, data_type_upper, value_words, _, _ in grouped:
                 register_offset = self._get_address_offset(sFPAddress) - start_offset
-                offset_bytes = register_offset * 4
-                if value_words == 1:
-                    raw_value = response_data[offset_bytes : offset_bytes + 4]
-                else:
-                    raw_value = response_data[offset_bytes : offset_bytes + 8]
+                response_start = response_word_count - register_offset - value_words
+                raw_value = "".join(
+                    response_words[response_start : response_start + value_words]
+                )
                 results[sFPAddress] = self._DecodeBatchValue(raw_value, data_type_upper)
 
         return results
@@ -421,8 +420,11 @@ class MewtocolComConnection:
         return self._DecodeResponseFromPlc_ReadContactPlural(sResponseFromPlc, "RC", len(bit_requests))
 
     def _DecodeBatchValue(self, sHexValue: str, sDataType: str) -> str | None:
+        if sHexValue is None:
+            assert False, f"Invalid value {sHexValue}"
+            return None
         if sDataType in (DataTypes.INT, DataTypes.DINT):
-            return str(int.from_bytes(bytes.fromhex(sHexValue), byteorder="big", signed=True))
+            return str(int.from_bytes(bytes.fromhex(sHexValue), byteorder="big", signed=True)) #hex to integer
         if sDataType in (DataTypes.UINT, DataTypes.UDINT):
             return str(int(sHexValue, 16))
         if sDataType == DataTypes.REAL:
@@ -431,6 +433,7 @@ class MewtocolComConnection:
             return sHexValue
         if sDataType == DataTypes.DWORD:
             return sHexValue
+        assert False, f"Invalid data type {sDataType}"
         return None
 
     def _ReadFromPlc_SingleAddress(self, sFPAddress: str) -> str | None: #Returns the read value or, if an error has occurred, the value None

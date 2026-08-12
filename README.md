@@ -50,7 +50,7 @@ panasonic_plc:
     scan_interval: 1.0  # seconds, examples: 0.5 or 00:00:00.500000 or 00:00:10
 
     sensors:  # PLC -> Home Assistant. Define entities to fetch data from the PLC to Home Assistant based on the configured "scan_interval".
-      - name: "Heatpump Circulation Pump" #sensor.heatpump_circulation_pump
+      - name: "Heatpump Circulation Pump" #binary_sensor.heatpump_circulation_pump
         fp_address: "Y27F"
         data_type: "BOOL"
         icon: mdi:pump
@@ -63,7 +63,7 @@ panasonic_plc:
         device_class: temperature
         state_class: measurement
 
-      - name: "Heatpump Diverter Valve Request OPEN"  #sensor.heatpump_diverter_valve_request_open
+      - name: "Heatpump Diverter Valve Request OPEN"  #binary_sensor.heatpump_diverter_valve_request_open
         fp_address: "X26F"
         data_type: "BOOL"
         icon: mdi:valve-open
