@@ -18,9 +18,18 @@ If this integration is useful to you, consider buying me a coffee (or a beer üç
 
 ## Installation
 
+### Download from GitHub (for beginners)
+If you are downloading the integration directly from GitHub, follow these steps:
+
+1. Open the [Panasonic PLC GitHub repository](https://github.com/Berlenz/Home-Assistant-Pansonic-PLC) in your browser.
+2. Click the green **Code** button and select **Download ZIP**.
+3. Open the downloaded ZIP file and extract it on your computer.
+4. Open the extracted folder. Copy the folder named `panasonic_plc`.
+5. Continue with [Option A: Manual installation](#option-a-manual-installation) below to copy the integration to Home Assistant.
+
 ### Option A: Manual installation
-1. Copy this folder to your Home Assistant config:
-   - `config/custom_components/panasonic_plc/`
+1. Copy the folder named `panasonic_plc` to your Home Assistant config:
+  - `config/custom_components/panasonic_plc/`
 2. Restart Home Assistant.
 3. Add YAML configuration (example below).
 
