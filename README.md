@@ -33,6 +33,7 @@ Place a YAML file in your Home Assistant `packages` directory, for example:
 - `config/packages/panasonic_plc.yaml`
 
 Connection settings (`ipv4_address`, `port`, `plc_name`, `station_number`, `scan_interval`) are configured once per PLC, and the three features below are configured underneath it.
+If `scan_interval` is not specified, the default is 30 seconds.
 
 ### 1. Sensor read (PLC -> Home Assistant)
 Configure PLC addresses under `sensors` to fetch data from the PLC into Home Assistant based on the configured `scan_interval`. This creates new sensor/binary_sensor entities in Home Assistant.
@@ -50,8 +51,8 @@ panasonic_plc:
   - ipv4_address: 192.168.178.100
     port: 9094
     plc_name: "PLC1"
-    station_number: 1
-    scan_interval: 1.0  # seconds, examples: 0.5 or 00:00:00.500000 or 00:00:10
+    # station_number: 1  # optional; uses "EE" when omitted
+    scan_interval: 1.0  # unit is seconds; accepts float seconds and time-period style values; examples: 0.5 or 00:00:00.500000 or 00:00:10
 
     sensors:  # 1. Sensor read: PLC -> Home Assistant
       - name: "Heatpump Circulation Pump" #binary_sensor.heatpump_circulation_pump
@@ -178,7 +179,3 @@ Allowed addresses per data type:
 - Start with a slower `scan_interval` if communication is unstable.
 - Confirm network access from Home Assistant host to PLC TCP port.
 
-## Notes
-
-- `scan_interval` accepts float seconds and time-period style values.
-- If `plc_name` is not set, the integration uses IP-based naming.
